@@ -11,6 +11,8 @@ const ReportPreview: React.FC = () => {
   const { reportJson, score } = useAppContext();
   const navigate = useNavigate();
 
+  console.log(score, "score in report preview");
+
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
