@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Header from "../components/common/Header";
 import Footer from "../components/common/Footer";
 
@@ -9,9 +9,11 @@ const LOCAL_KEY = "admin_session";
 
 // Session validity: 1 month in milliseconds
 const SESSION_EXPIRY = 30 * 24 * 60 * 60 * 1000;
+const FM_API = import.meta.env.VITE_FM_API;
+const FM_AUTH = import.meta.env.VITE_FM_AUTH;
 
 const Admin: React.FC = () => {
-  //   const navigate = useNavigate();
+  const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -49,11 +51,11 @@ const Admin: React.FC = () => {
   const fetchLeaderboard = async () => {
     try {
       setLoading(true);
-      const response = await fetch("https://py-fmd.vercel.app/api/dataApi", {
+      const response = await fetch(FM_API, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Basic RGV2ZWxvcGVyOmFkbWluYml6",
+          Authorization: FM_AUTH,
         },
         body: JSON.stringify({
           fmServer: "kibiz-linux.smtech.cloud",
@@ -78,13 +80,14 @@ const Admin: React.FC = () => {
     }
   };
 
-  const handleViewSample1 = () => console.log("View Sample Template 1");
-  const handleViewSample2 = () => console.log("View Sample Template 2");
+  const handleViewSample1 = () => {
+    navigate("/preview-template");
+  };
 
   // Rank icon
   const getRankIcon = (rank: number) => {
     if (rank === 1) return "🏆";
-    if (rank === 2) return "🥈";
+    if (rank === 2) return "🏆";
     if (rank === 3) return "🥉";
     return `#${rank}`;
   };
@@ -171,12 +174,6 @@ const Admin: React.FC = () => {
                 className="bg-[#5e17eb] hover:bg-purple-700 text-white font-semibold rounded-full px-8 py-3 text-lg shadow-lg transition-all duration-200 transform hover:scale-105"
               >
                 View Sample Template 1
-              </button>
-              <button
-                onClick={handleViewSample2}
-                className="border border-[#5e17eb] text-[#5e17eb] font-semibold rounded-full px-8 py-3 text-lg transition-all duration-200 transform hover:scale-105 hover:bg-[#5e17eb] hover:text-white"
-              >
-                View Sample Template 2
               </button>
             </div>
           </>

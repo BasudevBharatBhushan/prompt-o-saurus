@@ -28,11 +28,8 @@ const ADMIN_PASSWORD = "kibiz"; // WARNING: Replace with secure auth in producti
 const LOCAL_KEY = "admin_session";
 const SESSION_EXPIRY = 30 * 24 * 60 * 60 * 1000;
 
-const FETCH_URL = "https://py-fmd.vercel.app/api/dataApi";
-const FETCH_AUTH = "Basic RGV2ZWxvcGVyOmFkbWluYml6";
-
-const UPDATE_URL = "https://py-fmd.vercel.app/api/dataApi";
-const UPDATE_AUTH = "Basic RGV2ZWxvcGVyOmFkbWluYml6";
+const FM_API = import.meta.env.VITE_FM_API;
+const FM_AUTH = import.meta.env.VITE_FM_AUTH;
 
 // === Main Component ===
 const PreviewTemplate: React.FC = () => {
@@ -120,11 +117,11 @@ const PreviewTemplate: React.FC = () => {
     };
 
     try {
-      const res = await fetch(FETCH_URL, {
+      const res = await fetch(FM_API, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: FETCH_AUTH,
+          Authorization: FM_API,
         },
         body: JSON.stringify(payload),
       });
@@ -165,11 +162,11 @@ const PreviewTemplate: React.FC = () => {
     };
 
     try {
-      const res = await fetch(UPDATE_URL, {
+      const res = await fetch(FM_API, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: UPDATE_AUTH,
+          Authorization: FM_AUTH,
         },
         body: JSON.stringify(payload),
       });
