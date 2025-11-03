@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../components/common/Header";
 import Footer from "../components/common/Footer";
 import DynamicReport from "../components/sections/DynamicReport";
@@ -24,7 +25,7 @@ interface ApiResponse {
 
 // === Constants ===
 const ADMIN_EMAIL = "priya@kibizsystems.com";
-const ADMIN_PASSWORD = "kibiz"; // WARNING: Replace with secure auth in production
+const ADMIN_PASSWORD = "kibiz";
 const LOCAL_KEY = "admin_session";
 const SESSION_EXPIRY = 30 * 24 * 60 * 60 * 1000;
 
@@ -33,6 +34,7 @@ const FM_AUTH = import.meta.env.VITE_FM_AUTH;
 
 // === Main Component ===
 const PreviewTemplate: React.FC = () => {
+  const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -194,16 +196,21 @@ const PreviewTemplate: React.FC = () => {
     setPreviewJson(null);
   };
 
+  // === Navigate to Leaderboard ===
+  const handleNavigateToLeaderboard = () => {
+    navigate("/admin");
+  };
+
   // === Login Screen ===
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen min-w-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-          <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+          <div className="bg-white rounded-lg shadow-md p-8 border border-gray-200">
             <div className="text-center mb-8">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+              <div className="w-16 h-16 bg-[#5e17eb] rounded-lg flex items-center justify-center mx-auto mb-4">
                 <svg
-                  className="w-9 h-9 text-white"
+                  className="w-8 h-8 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -216,27 +223,31 @@ const PreviewTemplate: React.FC = () => {
                   />
                 </svg>
               </div>
-              <h1 className="text-2xl font-bold text-gray-900">Admin Portal</h1>
-              <p className="text-gray-600 mt-1">Template Management System</p>
+              <h1 className="text-2xl font-semibold text-gray-900">
+                Admin Login
+              </h1>
+              <p className="text-gray-600 text-sm mt-1">
+                Template Management System
+              </p>
             </div>
 
-            <form onSubmit={handleLogin} className="space-y-5">
+            <form onSubmit={handleLogin} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email
                 </label>
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#5e17eb] focus:border-transparent"
                   placeholder="admin@example.com"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Password
                 </label>
                 <input
@@ -244,14 +255,14 @@ const PreviewTemplate: React.FC = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#5e17eb] focus:border-transparent"
                   placeholder="••••••••"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold py-3 rounded-xl transition-all duration-200 transform hover:scale-[1.02] shadow-lg"
+                className="w-full bg-[#5e17eb] hover:bg-purple-700 text-white font-medium py-2.5 rounded-md transition-colors"
               >
                 Sign In
               </button>
@@ -264,70 +275,96 @@ const PreviewTemplate: React.FC = () => {
 
   // === Main Dashboard ===
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen w-screen bg-gray-50 flex flex-col">
       <Header />
 
-      {/* Toolbar */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <h2 className="text-2xl font-bold text-gray-900">
-              Template Manager
-            </h2>
-            <div className="h-6 w-px bg-gray-300" />
-            <select
-              value={level}
-              onChange={(e) => {
-                const val = e.target.value;
-                setLevel(val);
-                fetchTemplates(val);
-              }}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white"
-            >
-              <option value="EASY">Easy</option>
-              <option value="MEDIUM">Medium</option>
-              <option value="HARD">Hard</option>
-              <option value="EXPERT">Expert</option>
-            </select>
+      {/* Top Bar */}
+      <div className="bg-white border-b border-gray-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <h1 className="text-xl font-semibold text-gray-900">
+                Template Manager
+              </h1>
+              <div className="h-6 w-px bg-gray-300" />
+              <select
+                value={level}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setLevel(val);
+                  fetchTemplates(val);
+                }}
+                className="px-3 py-1.5 border border-gray-300 rounded-md text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#5e17eb] bg-white"
+              >
+                <option value="EASY">Easy</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="HARD">Hard</option>
+                <option value="EXPERT">Expert</option>
+              </select>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleNavigateToLeaderboard}
+                className="flex items-center gap-2 px-4 py-2 bg-[#5e17eb] hover:bg-purple-700 text-white font-medium text-sm rounded-md transition-colors"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  />
+                </svg>
+                Leaderboard
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 font-medium text-sm rounded-md transition-colors"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                  />
+                </svg>
+                Logout
+              </button>
+            </div>
           </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 font-medium text-sm transition"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-              />
-            </svg>
-            Logout
-          </button>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="flex-1 p-6 max-w-7xl mx-auto w-full">
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 h-full">
-          {/* Left: Templates + Editor */}
+          {/* Left Column */}
           <div className="flex flex-col gap-6">
             {/* Template List */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 h-64 flex flex-col">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5 h-72">
+              <h2 className="text-base font-semibold text-gray-900 mb-3">
                 Available Templates
-              </h3>
-              <div className="flex-1 overflow-y-auto">
+              </h2>
+              <div className="overflow-y-auto h-52">
                 {loading ? (
                   <div className="flex items-center justify-center h-full">
                     <div className="text-center">
-                      <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                      <p className="text-sm text-gray-600">Loading...</p>
+                      <div className="w-8 h-8 border-3 border-[#5e17eb] border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                      <p className="text-sm text-gray-600">
+                        Loading templates...
+                      </p>
                     </div>
                   </div>
                 ) : templates.length > 0 ? (
@@ -336,17 +373,17 @@ const PreviewTemplate: React.FC = () => {
                       <div
                         key={t.recordId}
                         onClick={() => setSelected(t)}
-                        className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${
+                        className={`p-3 rounded-md border cursor-pointer transition-all ${
                           selected?.recordId === t.recordId
-                            ? "border-purple-500 bg-purple-50"
-                            : "border-transparent bg-gray-50 hover:bg-gray-100 hover:border-gray-300"
+                            ? "border-[#5e17eb] bg-purple-50"
+                            : "border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300"
                         }`}
                       >
                         <div className="flex justify-between items-center">
-                          <span className="font-medium text-gray-800 truncate">
-                            {t.TemplateName || "Untitled"}
+                          <span className="font-medium text-sm text-gray-800 truncate">
+                            {t.TemplateName || "Untitled Template"}
                           </span>
-                          <span className="text-xs px-2 py-1 bg-white border rounded-full text-gray-600">
+                          <span className="text-xs px-2 py-0.5 bg-gray-100 border border-gray-200 rounded text-gray-600 font-medium ml-2">
                             {t.Level}
                           </span>
                         </div>
@@ -354,27 +391,27 @@ const PreviewTemplate: React.FC = () => {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-center text-gray-500 mt-10">
-                    No templates found
-                  </p>
+                  <div className="flex items-center justify-center h-full">
+                    <p className="text-sm text-gray-500">No templates found</p>
+                  </div>
                 )}
               </div>
             </div>
 
             {/* Editor */}
             {selected ? (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col flex-1 overflow-hidden">
-                <div className="p-5 border-b border-gray-200 flex justify-between items-center">
-                  <h3 className="text-lg font-semibold text-gray-900">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col flex-1">
+                <div className="px-5 py-4 border-b border-gray-200 flex justify-between items-center">
+                  <h2 className="text-base font-semibold text-gray-900">
                     Edit Template
-                  </h3>
+                  </h2>
                   <button
                     onClick={handleUpdate}
                     disabled={saving}
-                    className={`flex items-center gap-2 px-5 py-2 rounded-lg font-medium text-sm transition ${
+                    className={`flex items-center gap-2 px-4 py-2 rounded-md font-medium text-sm transition-colors ${
                       saving
                         ? "bg-gray-400 text-white cursor-not-allowed"
-                        : "bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:shadow-md"
+                        : "bg-[#5e17eb] hover:bg-purple-700 text-white"
                     }`}
                   >
                     {saving ? (
@@ -397,15 +434,15 @@ const PreviewTemplate: React.FC = () => {
                             d="M5 13l4 4L19 7"
                           />
                         </svg>
-                        Save
+                        Save Changes
                       </>
                     )}
                   </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-5 space-y-5">
+                <div className="flex-1 overflow-y-auto p-5 space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
                       Template Name
                     </label>
                     <input
@@ -417,18 +454,18 @@ const PreviewTemplate: React.FC = () => {
                           TemplateName: e.target.value,
                         })
                       }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#5e17eb] focus:border-transparent"
                     />
                   </div>
 
                   {["SetupJSON", "ReportConfigJSON", "ReportJSON"].map(
                     (field) => (
                       <div key={field}>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          {field.replace("JSON", "")} JSON
+                        <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                          {field.replace("JSON", " JSON")}
                         </label>
                         <textarea
-                          rows={field === "ReportJSON" ? 6 : 4}
+                          rows={field === "ReportJSON" ? 8 : 5}
                           value={selected[field as keyof Template] || ""}
                           onChange={(e) => {
                             const val = e.target.value;
@@ -442,14 +479,14 @@ const PreviewTemplate: React.FC = () => {
                               }
                             }
                           }}
-                          className={`w-full px-4 py-2 border font-mono text-xs rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none ${
+                          className={`w-full px-3 py-2 border font-mono text-xs rounded-md focus:outline-none focus:ring-2 focus:ring-[#5e17eb] focus:border-transparent resize-none ${
                             field === "ReportJSON" && jsonError
-                              ? "border-red-300"
+                              ? "border-red-300 bg-red-50"
                               : "border-gray-300"
                           }`}
                         />
                         {field === "ReportJSON" && jsonError && (
-                          <p className="text-red-600 text-xs mt-1">
+                          <p className="text-red-600 text-xs mt-1 font-medium">
                             {jsonError}
                           </p>
                         )}
@@ -459,22 +496,24 @@ const PreviewTemplate: React.FC = () => {
                 </div>
 
                 {message && (
-                  <div
-                    className={`mx-5 mb-5 p-3 rounded-lg text-sm font-medium ${
-                      message.includes("success")
-                        ? "bg-green-50 text-green-800 border border-green-200"
-                        : "bg-red-50 text-red-800 border border-red-200"
-                    }`}
-                  >
-                    {message}
+                  <div className="mx-5 mb-5">
+                    <div
+                      className={`p-3 rounded-md text-sm font-medium ${
+                        message.includes("success")
+                          ? "bg-green-50 text-green-700 border border-green-200"
+                          : "bg-red-50 text-red-700 border border-red-200"
+                      }`}
+                    >
+                      {message}
+                    </div>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-200 flex items-center justify-center">
+              <div className="flex-1 bg-white rounded-lg shadow-sm border border-gray-200 flex items-center justify-center">
                 <div className="text-center text-gray-400">
                   <svg
-                    className="w-16 h-16 mx-auto mb-3"
+                    className="w-12 h-12 mx-auto mb-3"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -486,18 +525,20 @@ const PreviewTemplate: React.FC = () => {
                       d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                     />
                   </svg>
-                  <p className="font-medium">Select a template to edit</p>
+                  <p className="font-medium text-sm">
+                    Select a template to edit
+                  </p>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Right: Live Preview */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col overflow-hidden">
-            <div className="p-5 border-b border-gray-200 flex justify-between items-center">
-              <h3 className="text-lg font-semibold text-gray-900">
+          {/* Right Column - Preview */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col overflow-hidden">
+            <div className="px-5 py-4 border-b border-gray-200 flex justify-between items-center">
+              <h2 className="text-base font-semibold text-gray-900">
                 Live Preview
-              </h3>
+              </h2>
               <div className="flex items-center gap-2">
                 <div
                   className={`w-2 h-2 rounded-full ${previewJson ? "bg-green-500" : "bg-gray-300"}`}
@@ -511,10 +552,10 @@ const PreviewTemplate: React.FC = () => {
               {previewJson ? (
                 <DynamicReport jsonData={previewJson} />
               ) : (
-                <div className="h-full flex items-center justify-center text-center text-gray-400">
-                  <div>
+                <div className="h-full flex items-center justify-center text-center">
+                  <div className="text-gray-400">
                     <svg
-                      className="w-20 h-20 mx-auto mb-4"
+                      className="w-16 h-16 mx-auto mb-4"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -526,8 +567,8 @@ const PreviewTemplate: React.FC = () => {
                         d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                       />
                     </svg>
-                    <p className="font-medium">No Preview</p>
-                    <p className="text-sm mt-1">
+                    <p className="font-medium text-sm">No Preview Available</p>
+                    <p className="text-xs mt-1">
                       Enter valid Report JSON to see preview
                     </p>
                   </div>
