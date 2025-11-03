@@ -65,7 +65,7 @@ const ReportPreview: React.FC = () => {
         <div className="flex flex-wrap justify-center gap-4 mt-2 mb-8">
           {/* Card outline button style with points scored */}
           <div className="border border-[#5e17eb] text-[#5e17eb] font-semibold rounded-full px-5 py-2 text-md flex items-center gap-2">
-            Points Scored: {score ?? 0}
+            Points Scored: {score?.score ?? 0}
           </div>
 
           {isReady && (
