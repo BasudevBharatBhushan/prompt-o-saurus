@@ -10,6 +10,8 @@ import UserForm from "./pages/UserForm";
 import ReportPreview from "./pages/ReportPreview";
 import ReportPreviewTest from "./pages/ReportPreviewTest";
 import LoaderTest from "./pages/LoaderTest";
+import Admin from "./pages/admin";
+import PreviewTemplate from "./pages/PreviewTemplate";
 
 function App() {
   return (
@@ -29,6 +31,8 @@ function App() {
           <Route path="/report-preview" element={<ReportPreview />} />
           <Route path="/report-preview-test" element={<ReportPreviewTest />} />
           <Route path="/loader-test" element={<LoaderTest />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/preview-template" element={<PreviewTemplate />} />
         </Routes>
       </main>
       {/* <Footer /> */}
