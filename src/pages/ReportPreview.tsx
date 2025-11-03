@@ -8,7 +8,7 @@ import Header from "../components/common/Header";
 import Footer from "../components/common/Footer";
 
 const ReportPreview: React.FC = () => {
-  const { reportJson } = useAppContext();
+  const { reportJson, score } = useAppContext();
   const navigate = useNavigate();
 
   const [isReady, setIsReady] = useState(false);
@@ -63,12 +63,10 @@ const ReportPreview: React.FC = () => {
 
         {/* Buttons */}
         <div className="flex flex-wrap justify-center gap-4 mt-2 mb-8">
-          <button
-            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold rounded-full shadow-lg transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-3 px-6 py-2 text-md"
-            onClick={() => navigate("/generate-report")}
-          >
-            ⬅ Back to Home
-          </button>
+          {/* Card outline button style with points scored */}
+          <div className="border border-[#5e17eb] text-[#5e17eb] font-semibold rounded-full px-5 py-2 text-md flex items-center gap-2">
+            Points Scored: {score ?? 0}
+          </div>
 
           {isReady && (
             <button
@@ -76,7 +74,7 @@ const ReportPreview: React.FC = () => {
               onClick={() => navigate("/score")}
             >
               <img src={skeletonImage} alt="" className="h-5 lg:h-6 xl:h-7" />
-              <span>View Score</span>
+              <span>Continue</span>
             </button>
           )}
         </div>

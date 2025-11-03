@@ -27,7 +27,7 @@ const GenerateReport: React.FC = () => {
     reportConfig,
 
     setScore,
-
+    setTotalScore,
     level,
   } = useAppContext();
 
@@ -169,35 +169,82 @@ const GenerateReport: React.FC = () => {
     aiResponse: string,
     score: ScoreJSON
   ) => {
-    const payload = {
-      fmServer: "kibiz-linux.smtech.cloud",
-      method: "createRecord",
-      methodBody: {
-        database: "KibiAIDemo",
-        layout: "KiBiAISessions",
-        record: {
-          UserID: userID || "0",
-          TemplateID: templateID ? String(templateID) : "1",
-          UserPrompt: userPrompt,
-          AIResponse: aiResponse,
-          Score: JSON.stringify(score),
-          OpenAIThreadID: threadId,
+    try {
+      const payload = {
+        fmServer: "kibiz-linux.smtech.cloud",
+        method: "createRecord",
+        methodBody: {
+          database: "KibiAIDemo",
+          layout: "KiBiAISessions",
+          record: {
+            UserID: userID || "0",
+            TemplateID: templateID ? String(templateID) : "1",
+            UserPrompt: userPrompt,
+            AIResponse: aiResponse,
+            Score: JSON.stringify(score),
+            OpenAIThreadID: threadId,
+          },
         },
-      },
-      session: { token: "", required: "", kill_session: true },
-    };
+        session: { token: "", required: "", kill_session: true },
+      };
 
-    const res = await fetch(FM_API, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: FM_AUTH,
-      },
-      body: JSON.stringify(payload),
-    });
+      // Step 1: Create record
+      const res = await fetch(FM_API, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: FM_AUTH,
+        },
+        body: JSON.stringify(payload),
+      });
 
-    if (!res.ok) throw new Error(`FM createSession failed (${res.status})`);
-    return res.json();
+      if (!res.ok) throw new Error(`FM createSession failed (${res.status})`);
+      const createResponse = await res.json();
+
+      // Step 2: On success → trigger leaderboard update script via findRecord
+      const findPayload = {
+        fmServer: "kibiz-linux.smtech.cloud",
+        method: "findRecord",
+        methodBody: {
+          database: "KibiAIDemo",
+          layout: "KiBiAISessions _TotalScore",
+          query: [{ UserID: Number(userID) || 0 }],
+          limit: 1,
+          scripts: {
+            "script.prerequest": "Create-Update-Leaderborad",
+            "script.prerequest.param": String(userID || 0),
+          },
+        },
+        session: { token: "", required: "" },
+      };
+
+      const leaderboardRes = await fetch(FM_API, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: FM_AUTH,
+        },
+        body: JSON.stringify(findPayload),
+      });
+
+      if (!leaderboardRes.ok)
+        throw new Error(`Leaderboard update failed (${leaderboardRes.status})`);
+
+      const leaderboardData = await leaderboardRes.json();
+
+      // Step 3: Extract TotalScore from response
+      const totalScore =
+        leaderboardData?.records?.[0]?.["KSessions_LBc__UserID::TotalScore"] ||
+        0;
+
+      // Step 4: Store in React state
+      setTotalScore(totalScore);
+
+      return { createResponse, leaderboardData };
+    } catch (error) {
+      console.error("Error in createSessionRecord:", error);
+      throw error;
+    }
   };
 
   // 🔍 Compare ideal vs user report configs and get numeric score
@@ -240,9 +287,7 @@ const GenerateReport: React.FC = () => {
                           columns: { type: "object" },
                           group_by: { type: "object" },
                           filters: { type: "object" },
-                          date_range: { type: "object" },
                           sorting: { type: "object" },
-                          joins: { type: "object" },
                         },
                       },
                       suggestions: {
@@ -264,14 +309,65 @@ const GenerateReport: React.FC = () => {
             messages: [
               {
                 role: "system",
-                content:
-                  'You are a Report Comparison AI that scores user-generated reports against ideal reference reports using item-by-item matching.\n\n## Scoring Limits\nEASY: 15 | MEDIUM: 35 | HARD: 50 | EXPERT: 100\n\n## Compare (Weighted by Priority)\nCore (Highest Priority): Tables, Joins, Filters, Groupings, Aggregations\nSecondary (Medium Priority): Sorting, Field Selection, Calculated Fields, Date Ranges\nOptional (Low Priority): Aliases, Formatting, Limits\n\n## Ignore\nReport titles, headers, labels, metadata, \'response_to_user\', \'report_header\', cosmetic JSON differences.\n\n## Scoring Formula\n1. Count scoreable items in the ideal report (exclude ignored elements)\n2. Points per item = Max Score / Total Items\n3. Award: Full points for exact match, Half points for partial match, Zero for missing or incorrect\n4. Logical equivalence > syntax (e.g., Status=\'Active\' equals \'Active\'=Status)\n5. Final score must be a whole number\n\n## Output Expectation\nYour tone should be friendly, supportive, and user-oriented (like a helpful mentor).\nReturn ONLY a function call using the provided tool with the following JSON structure:\n{\n  "score": <number>,\n  "max_score": <15|35|50|100>,\n  "level": "<EASY|MEDIUM|HARD|EXPERT>",\n  "overview": {\n    "columns": { "status": "<matched|partial|mismatch>", "notes": "<string>" },\n    "group_by": { "status": "<matched|partial|mismatch>", "notes": "<string>" },\n    "filters": { "status": "<matched|partial|mismatch>", "notes": "<string>" },\n    "date_range": { "status": "<matched|partial|mismatch>", "notes": "<string>" },\n    "sorting": { "status": "<matched|partial|mismatch>", "notes": "<string>" },\n    "joins": { "status": "<matched|partial|mismatch>", "notes": "<string>" }\n  },\n  "suggestions": [\n    "<improvement 1>",\n    "<improvement 2>"\n  ]\n}',
+                content: `You are a Report Comparison AI that scores user-generated reports against ideal reference reports using item-by-item matching.
+  
+  ## Scoring Limits
+  EASY: 15 | MEDIUM: 35 | HARD: 50 | EXPERT: 100
+  
+  ## Compare (Weighted by Priority)
+  Core (Highest Priority): Tables, Filters, Groupings, Aggregations
+  Secondary (Medium Priority): Sorting, Field Selection, Calculated Fields
+  Optional (Low Priority): Aliases, Formatting, Limits
+  
+  ## Ignore
+  Report titles, headers, labels, metadata, 'response_to_user', 'report_header', cosmetic JSON differences, and all date_range or join-related differences (these are considered acceptable variations).
+  
+  ## Scoring Formula
+  1. Count scoreable items in the ideal report (exclude ignored elements)
+  2. Points per item = Max Score / Total Items
+  3. Award: Full points for exact match, Half points for partial match, Zero for missing or incorrect
+  4. Logical equivalence > syntax (e.g., Status='Active' equals 'Active'=Status)
+  5. Final score must be a whole number
+  
+  ## Output Expectation
+  Your tone should be friendly, supportive, and user-oriented (like a helpful mentor).
+  Return ONLY a function call using the provided tool with the following JSON structure:
+  {
+    "score": <number>,
+    "max_score": <15|35|50|100>,
+    "level": "<EASY|MEDIUM|HARD|EXPERT>",
+    "overview": {
+      "columns": { "status": "<matched|partial|mismatch>", "notes": "<string>" },
+      "group_by": { "status": "<matched|partial|mismatch>", "notes": "<string>" },
+      "filters": { "status": "<matched|partial|mismatch>", "notes": "<string>" },
+      "sorting": { "status": "<matched|partial|mismatch>", "notes": "<string>" }
+    },
+    "suggestions": [
+      "<suggestion 1>",
+      "<suggestion 2>"
+    ]
+  }
+  
+  ## Suggestion Guidelines
+  Suggestions should be phrased in a positive, helpful manner and focused on improving the user's natural language prompt that generated the report.
+  Examples:
+  - "Try being more specific about which fields you want grouped."
+  - "You could mention the desired filter conditions more clearly."
+  - "Clarify whether you want sorting in ascending or descending order."
+  - "Add context about which dataset or table to pull data from."
+  Avoid purely technical feedback like field names or syntax corrections — focus on user prompt clarity and intent refinement.`,
               },
               {
                 role: "user",
-                content: `Compare the reports and return the score with a user-friendly overview.\n\nLEVEL: ${level}\n\nIdealReportConfig:\n${JSON.stringify(
-                  idealReportConfig
-                )}\n\nuserReportConfig:\n${JSON.stringify(userReportConfig)}`,
+                content: `Compare the reports and return the score with a user-friendly overview.
+  
+  LEVEL: ${level}
+  
+  IdealReportConfig:
+  ${JSON.stringify(idealReportConfig)}
+  
+  userReportConfig:
+  ${JSON.stringify(userReportConfig)}`,
               },
             ],
           }),
@@ -281,7 +377,6 @@ const GenerateReport: React.FC = () => {
       if (!response.ok)
         throw new Error(`OpenAI Evaluation API failed (${response.status})`);
 
-      // ✅ Only change: parse direct JSON
       const data = await response.json();
 
       return {

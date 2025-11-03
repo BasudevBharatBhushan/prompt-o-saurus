@@ -16,6 +16,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [reportConfig, setReportConfig] = useState(null);
   const [customReportConfig, setCustomReportConfig] = useState(null);
   const [isReportGenerated, setIsReportGenerated] = useState(false);
+  const [totalScore, setTotalScore] = useState(0);
 
   // Function to check and restore session
   const isUserSignedIn = (): boolean => {
@@ -65,6 +66,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setCustomReportConfig,
     isReportGenerated,
     setIsReportGenerated,
+    totalScore,
+    setTotalScore,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

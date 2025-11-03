@@ -7,28 +7,29 @@ import Footer from "../components/common/Footer";
 
 const Score: React.FC = () => {
   const navigate = useNavigate();
-  const { score, userName, level } = useAppContext();
+  const { score, userName, level, totalScore } = useAppContext();
 
-  // ✅ TEST JSON (Remove once done testing UI)
+  // ✅ TEST JSON (updated to match new structure)
   const testScore = {
     score: 12,
     max_score: 15,
     level: "EASY",
     overview: {
-      columns: { status: "matched", notes: "All columns match." },
-      group_by: { status: "partial", notes: "Order differs." },
-      filters: { status: "mismatch", notes: "Extra filter detected." },
-      date_range: { status: "partial", notes: "End date mismatch." },
-      sorting: { status: "matched", notes: "Sorting is correct." },
-      joins: { status: "matched", notes: "All joins match properly." },
+      columns: { status: "matched", notes: "All columns match well." },
+      group_by: { status: "partial", notes: "Grouping is partially aligned." },
+      filters: {
+        status: "mismatch",
+        notes: "Filter conditions differ slightly.",
+      },
+      sorting: { status: "matched", notes: "Sorting matches perfectly." },
     },
     suggestions: [
-      "Remove extra filter 'Region'.",
-      "Align date range to match ideal report.",
+      "Try specifying which filters you want applied more clearly in your prompt.",
+      "Mention how you’d like the results grouped or summarized.",
     ],
   };
 
-  // ✅ Using second JSON format (no score_json wrapper)
+  // ✅ Use either fetched score or fallback test JSON
   const displayScoreJSON = score || testScore;
   const displayName = userName || "Explorer";
   const displayLevel = displayScoreJSON?.level ?? level ?? "EASY";
@@ -50,7 +51,7 @@ const Score: React.FC = () => {
   };
 
   return (
-    <div className="w-screen  min-h-[calc(100vh-60px)] bg-white flex justify-center items-start overflow-y-auto">
+    <div className="w-screen min-h-[calc(100vh-60px)] bg-white flex justify-center items-start overflow-y-auto">
       <div className="flex flex-col justify-between items-center w-full min-h-screen px-6 py-8 lg:px-8 lg:py-10 xl:px-12 xl:py-12 max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto">
         <Header />
 
@@ -66,15 +67,34 @@ const Score: React.FC = () => {
               </p>
             </div>
 
-            <h2 className="text-lg lg:text-xl xl:text-2xl font-semibold text-gray-700 mb-3 lg:mb-4 uppercase tracking-wide">
-              Total Points
-            </h2>
-            <div className="text-7xl lg:text-8xl xl:text-9xl font-extrabold text-[#5e17eb] mb-2 tracking-tight">
-              {numericScore}
+            {/* Score Display - Two Column Layout */}
+            <div className="grid grid-cols-2 gap-4 lg:gap-6 w-full mb-2">
+              {/* Current Score */}
+              <div className="flex flex-col items-center justify-center">
+                <h2 className="text-sm lg:text-base xl:text-lg font-semibold text-gray-600 mb-2 lg:mb-3 uppercase tracking-wide">
+                  Current Score
+                </h2>
+                <div className="text-5xl lg:text-6xl xl:text-7xl font-extrabold text-[#5e17eb] mb-1 tracking-tight">
+                  {numericScore}
+                </div>
+                <p className="text-xs lg:text-sm text-gray-500 font-medium">
+                  out of {displayScoreJSON.max_score}
+                </p>
+              </div>
+
+              {/* Total Score */}
+              <div className="flex flex-col items-center justify-center border-l-2 border-purple-200">
+                <h2 className="text-sm lg:text-base xl:text-lg font-semibold text-gray-600 mb-2 lg:mb-3 uppercase tracking-wide flex items-center gap-1">
+                  Total Score <span className="text-base lg:text-lg">🏆</span>
+                </h2>
+                <div className="text-5xl lg:text-6xl xl:text-7xl font-extrabold text-purple-600 mb-1 tracking-tight">
+                  {totalScore || 0}
+                </div>
+                <p className="text-xs lg:text-sm text-gray-500 font-medium">
+                  cumulative
+                </p>
+              </div>
             </div>
-            <p className="text-sm lg:text-base text-gray-500 font-medium">
-              out of {displayScoreJSON.max_score}
-            </p>
           </div>
 
           {/* Overview Section */}
@@ -112,7 +132,7 @@ const Score: React.FC = () => {
           {suggestions.length > 0 && (
             <div className="w-full max-w-2xl lg:max-w-3xl mb-10 lg:mb-12 xl:mb-14">
               <h3 className="text-2xl lg:text-3xl xl:text-3xl font-bold text-[#5e17eb] text-center mb-6 lg:mb-8 xl:mb-10 uppercase tracking-wide">
-                Suggestions
+                Prompt Suggestions
               </h3>
               <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 lg:p-7 xl:p-8 shadow-md">
                 <ul className="space-y-3 lg:space-y-4">
@@ -135,7 +155,7 @@ const Score: React.FC = () => {
           {/* Try Again */}
           <button
             className="bg-[#5e17eb] hover:bg-purple-700 text-white font-bold rounded-full shadow-lg transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-3 lg:gap-4 px-10 py-4 lg:px-12 lg:py-5 xl:px-14 xl:py-5 text-lg lg:text-xl xl:text-xl"
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/level")}
           >
             <img src={skeletonImage} alt="" className="h-6 lg:h-7 xl:h-8" />
             <span>TRY AGAIN</span>
