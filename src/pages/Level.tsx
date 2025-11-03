@@ -30,7 +30,7 @@ const Level: React.FC = () => {
     setLevel(label);
   };
 
-  const handleClick = () => {
+  const handleClick = async (): Promise<void> => {
     if (!selectedLevel) {
       alert("Please select a level before continuing.");
       return;
@@ -38,7 +38,10 @@ const Level: React.FC = () => {
 
     setIsReportGenerated(false);
 
-    if (isUserSignedIn()) {
+    const signedIn = await isUserSignedIn();
+    console.log("Is user signed in?", signedIn);
+
+    if (signedIn) {
       navigate("/preview");
     } else {
       navigate("/user-form");

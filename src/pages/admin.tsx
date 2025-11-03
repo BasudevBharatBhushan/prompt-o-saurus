@@ -173,7 +173,7 @@ const Admin: React.FC = () => {
                 onClick={handleViewSample1}
                 className="bg-[#5e17eb] hover:bg-purple-700 text-white font-semibold rounded-full px-8 py-3 text-lg shadow-lg transition-all duration-200 transform hover:scale-105"
               >
-                View Sample Template 1
+                View Sample Templates
               </button>
             </div>
           </>

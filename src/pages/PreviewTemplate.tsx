@@ -121,7 +121,7 @@ const PreviewTemplate: React.FC = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: FM_API,
+          Authorization: FM_AUTH,
         },
         body: JSON.stringify(payload),
       });

@@ -8,6 +8,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // Global state variables
   const [userID, setUserID] = useState("");
   const [userName, setUserName] = useState("");
+  const [userEmail, setUserEmail] = useState("");
   const [level, setLevel] = useState("EASY");
   const [score, setScore] = useState<any>(null);
   const [templateID, setTemplateID] = useState(1);
@@ -19,7 +20,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [totalScore, setTotalScore] = useState(0);
 
   // Function to check and restore session
-  const isUserSignedIn = (): boolean => {
+  const isUserSignedIn = async (): Promise<boolean> => {
     try {
       const stored = localStorage.getItem("kibiai_user");
       if (!stored) return false;
@@ -27,18 +28,69 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       const { userData, expiry } = JSON.parse(stored);
       const isValid = expiry && new Date(expiry) > new Date();
 
-      if (isValid && userData) {
+      console.log("Session valid:", isValid);
+
+      // If invalid or email missing
+      if (!isValid || !userData?.UserEmail) {
+        localStorage.removeItem("kibiai_user");
+        return false;
+      }
+
+      // Build the find payload (same structure as your reference)
+      const findPayload = {
+        fmServer: "kibiz-linux.smtech.cloud",
+        method: "findRecord",
+        methodBody: {
+          database: "KibiAIDemo",
+          layout: "KiBiAIUser",
+          limit: 1,
+          dateformats: 0,
+          query: [{ UserEmail: userData.UserEmail.replace(/@/g, "\\@") }],
+        },
+        session: {
+          token: "",
+          required: "",
+          kill_session: true,
+        },
+      };
+
+      console.log("Verifying user with payload:", findPayload);
+
+      // Fetch user from FileMaker
+      const findResponse = await fetch(`${import.meta.env.VITE_FM_API}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: import.meta.env.VITE_FM_AUTH,
+        },
+        body: JSON.stringify(findPayload),
+      });
+
+      const findData = await findResponse.json();
+
+      // Safely extract records
+      const records =
+        findData && findData.records && Array.isArray(findData.records)
+          ? findData.records
+          : [];
+
+      if (records.length > 0) {
+        const record = records[0];
+
         // Restore user details into global state
-        if (userData.recordId) setUserID(userData.recordId.toString());
-        if (userData.Name) setUserName(userData.Name);
+        if (record.recordId) setUserID(record.recordId.toString());
+        if (record.Name) setUserName(record.Name);
+
+        console.log("User session restored:", record);
+
         return true;
       } else {
-        // Expired or invalid
         localStorage.removeItem("kibiai_user");
         return false;
       }
     } catch (err) {
-      console.error("Error checking user session:", err);
+      console.error("Error verifying user session:", err);
+      localStorage.removeItem("kibiai_user");
       return false;
     }
   };
@@ -68,6 +120,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setIsReportGenerated,
     totalScore,
     setTotalScore,
+    userEmail,
+    setUserEmail,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

@@ -61,7 +61,7 @@ const UserForm: React.FC = () => {
           layout: "KiBiAIUser",
           limit: 1,
           dateformats: 0,
-          query: [{ UserEmail: formData.email.replace(/@/g, "//") }],
+          query: [{ UserEmail: formData.email.replace(/@/g, "\\@") }],
         },
         session: {
           token: "",
