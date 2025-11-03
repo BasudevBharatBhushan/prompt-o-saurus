@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import skeletonImage from "../assets/images/skeleton.png";
+import { useAppContext } from "../context/AppContext";
 
 import Header from "../components/common/Header";
 import Footer from "../components/common/Footer";
 
 const API_URL = import.meta.env.VITE_FM_API;
-const AUTH_HEADER = "Basic RGV2ZWxvcGVyOmFkbWluYml6";
+const AUTH_HEADER = import.meta.env.VITE_FM_AUTH;
 
 const UserForm: React.FC = () => {
   const navigate = useNavigate();
@@ -19,6 +20,8 @@ const UserForm: React.FC = () => {
     company: "",
     address: "",
   });
+
+  const { setUserID, setUserName } = useAppContext();
 
   // Auto redirect if valid session exists
   useEffect(() => {
@@ -139,6 +142,9 @@ const UserForm: React.FC = () => {
           "kibiai_user",
           JSON.stringify({ userData, expiry: expiry.toISOString() })
         );
+
+        setUserID(data.recordId.toString());
+        setUserName(data.fieldData.Name || formData.name);
 
         // Step 4: Redirect to /preview
         navigate("/preview");
