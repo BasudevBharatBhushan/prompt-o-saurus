@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import Header from "../components/common/Header";
 import Footer from "../components/common/Footer";
 
@@ -11,7 +11,7 @@ const LOCAL_KEY = "admin_session";
 const SESSION_EXPIRY = 30 * 24 * 60 * 60 * 1000;
 
 const Admin: React.FC = () => {
-  const navigate = useNavigate();
+  //   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
