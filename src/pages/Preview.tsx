@@ -7,7 +7,7 @@ import { useAppContext } from "../context/AppContext";
 import Header from "../components/common/Header";
 import Footer from "../components/common/Footer";
 
-const API_URL = "https://python-fm-dapi-weaver.onrender.com/api/dataApi";
+const API_URL = import.meta.env.VITE_FM_API;
 const AUTH_HEADER = "Basic RGV2ZWxvcGVyOmFkbWluYml6";
 
 const Preview: React.FC = () => {

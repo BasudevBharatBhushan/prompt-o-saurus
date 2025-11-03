@@ -7,7 +7,7 @@ import DynamicReport from "../components/sections/DynamicReport";
 import { useAppContext } from "../context/AppContext";
 import Header from "../components/common/Header";
 
-const API_URL = "https://python-fm-dapi-weaver.onrender.com/api/dataApi";
+const API_URL = import.meta.env.VITE_FM_API;
 const AUTH_HEADER = "Basic RGV2ZWxvcGVyOmFkbWluYml6";
 
 // Responsive Scaling Hook
