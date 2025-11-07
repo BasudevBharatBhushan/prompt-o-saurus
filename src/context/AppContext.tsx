@@ -82,6 +82,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         if (record.Name) setUserName(record.Name);
 
         console.log("User session restored:", record);
+        console.log(userID, userName);
 
         return true;
       } else {
