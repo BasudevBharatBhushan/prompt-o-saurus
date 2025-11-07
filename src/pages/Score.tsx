@@ -7,7 +7,7 @@ import Footer from "../components/common/Footer";
 
 const Score: React.FC = () => {
   const navigate = useNavigate();
-  const { score, userName, level, totalScore } = useAppContext();
+  const { score, userName, level, totalScore, setLevel } = useAppContext();
 
   // ✅ TEST JSON (updated to match new structure)
   const testScore = {
@@ -155,7 +155,10 @@ const Score: React.FC = () => {
           {/* Try Again */}
           <button
             className="bg-[#5e17eb] hover:bg-purple-700 text-white font-bold rounded-full shadow-lg transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-3 lg:gap-4 px-10 py-4 lg:px-12 lg:py-5 xl:px-14 xl:py-5 text-lg lg:text-xl xl:text-xl"
-            onClick={() => navigate("/level")}
+            onClick={() => {
+              setLevel("");
+              navigate("/level");
+            }}
           >
             <img src={skeletonImage} alt="" className="h-6 lg:h-7 xl:h-8" />
             <span>TRY AGAIN</span>

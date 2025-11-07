@@ -9,7 +9,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [userID, setUserID] = useState("");
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
-  const [level, setLevel] = useState("EASY");
+  const [level, setLevel] = useState("");
   const [score, setScore] = useState<any>(null);
   const [templateID, setTemplateID] = useState(1);
   const [reportJson, setReportJson] = useState(null);
