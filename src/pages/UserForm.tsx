@@ -18,7 +18,7 @@ const UserForm: React.FC = () => {
     phone: "",
     email: "",
     company: "",
-    address: "",
+    // address: "",
   });
 
   const { setUserID, setUserName } = useAppContext();
@@ -105,7 +105,7 @@ const UserForm: React.FC = () => {
             Phone: formData.phone,
             UserEmail: formData.email,
             Company: formData.company,
-            Address: formData.address,
+            // Address: formData.address,
           },
         },
         session: {
@@ -191,21 +191,6 @@ const UserForm: React.FC = () => {
               />
             </div>
 
-            {/* Phone */}
-            <div className="flex flex-col">
-              <label className="text-sm font-semibold text-[#5e17eb] mb-1">
-                Phone
-              </label>
-              <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                className="p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#5e17eb]"
-                placeholder="Enter your phone number"
-              />
-            </div>
-
             {/* Email */}
             <div className="flex flex-col">
               <label className="text-sm font-semibold text-[#5e17eb] mb-1">
@@ -222,10 +207,31 @@ const UserForm: React.FC = () => {
               />
             </div>
 
+            {/* Phone */}
+            <div className="flex flex-col">
+              <label className="text-sm font-semibold text-[#5e17eb] mb-1">
+                Phone{" "}
+                <span className="text-gray-400 font-extralight text-xs">
+                  (optional)
+                </span>
+              </label>
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                className="p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#5e17eb]"
+                placeholder="Enter your phone number"
+              />
+            </div>
+
             {/* Company */}
             <div className="flex flex-col">
               <label className="text-sm font-semibold text-[#5e17eb] mb-1">
-                Company
+                Company{" "}
+                <span className="text-gray-400 font-extralight text-xs">
+                  (optional)
+                </span>
               </label>
               <input
                 type="text"
@@ -238,7 +244,7 @@ const UserForm: React.FC = () => {
             </div>
 
             {/* Address */}
-            <div className="flex flex-col">
+            {/* <div className="flex flex-col">
               <label className="text-sm font-semibold text-[#5e17eb] mb-1">
                 Address
               </label>
@@ -250,7 +256,7 @@ const UserForm: React.FC = () => {
                 placeholder="Enter your address"
                 rows={3}
               />
-            </div>
+            </div> */}
 
             {/* Submit */}
             <button

@@ -98,7 +98,7 @@ const Preview: React.FC = () => {
 
         {/* Report Container */}
         <div
-          className="bg-gray-50 rounded-lg shadow-sm border border-gray-200 overflow-hidden"
+          className="relative bg-gray-50 rounded-lg shadow-sm border border-gray-200 overflow-hidden"
           style={{
             height: "calc(100vh - 300px)",
             minHeight: "500px",

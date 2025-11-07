@@ -394,8 +394,19 @@ const GenerateReport: React.FC = () => {
     setProcessStart(true);
     setProcessStage(1);
 
-    if (!promptText.trim()) return alert("Please enter a prompt.");
-    if (!reportSetup) return alert("Missing report setup.");
+    if (!promptText.trim()) {
+      alert("Please enter a prompt.");
+      setLoading(false);
+      setProcessStart(false);
+      return;
+    }
+
+    if (!reportSetup) {
+      alert("Missing report setup.");
+      setLoading(false);
+      setProcessStart(false);
+      return;
+    }
 
     try {
       // 1️⃣ Assistant API
@@ -564,6 +575,59 @@ const GenerateReport: React.FC = () => {
             <img src={skeletonImage} alt="" className="h-6 lg:h-7" />
             <span>{loading ? "PROCESSING..." : "SUBMIT"}</span>
           </button>
+
+          {/* Instructions */}
+          <div className="w-full max-w-2xl mx-auto mt-6 mb-3">
+            <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl p-6 border-2 border-[#5e17eb] border-opacity-20 shadow-sm">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 mt-1">
+                  <div className="w-10 h-10 bg-[#5e17eb] rounded-full flex items-center justify-center text-white text-xl">
+                    💡
+                  </div>
+                </div>
+
+                <div className="flex-1">
+                  <h3 className="text-[#5e17eb] font-bold text-lg mb-2">
+                    How to Generate Your Report
+                  </h3>
+
+                  <div className="space-y-2 text-gray-700 text-sm leading-relaxed">
+                    <p>
+                      <span className="font-semibold text-[#5e17eb]">
+                        1. Enter your prompt
+                      </span>{" "}
+                      in the text box above describing the report from preview
+                    </p>
+
+                    <p>
+                      <span className="font-semibold text-[#5e17eb]">
+                        2. Review the database structure
+                      </span>{" "}
+                      below to understand how your tables are connected.
+                      <span className="inline-block ml-1 text-xs bg-white px-2 py-0.5 rounded-full border border-gray-300">
+                        Color-coded fields show relationships
+                      </span>
+                    </p>
+
+                    <p>
+                      <span className="font-semibold text-[#5e17eb]">
+                        3. Click SUBMIT
+                      </span>{" "}
+                      and watch Prompt-🦖-Saurus bring your data to life!
+                    </p>
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-[#5e17eb] border-opacity-20">
+                    <p className="text-xs text-gray-500 italic">
+                      💡 <span className="font-medium">Pro tip:</span> Be
+                      specific about which fields, filters, and groupings you
+                      want in your report.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* Display Tables and Relationships */}
 
